@@ -54,14 +54,38 @@ const Data = {
         "senator": ["Classic Edge Senator", "Prime Prestige Senator", "Urban Noble Senator", "Elite Cut Senator", "Signature Flow Senator", "Royal Minimal Senator", "Executive Drip Senator", "Prestige Line Senator", "Modern King Senator", "Sharp Authority Senator", "Apex Gentleman Senator", "Timeless Fit Senator"]
     },
     
-    generateProducts() {
+generateProducts() {
+        const customPrices = {
+            "ankara": [16000, 18000, 17000, 16000, 14000, 20000, 19000, 28000, 20000, 25000, 19000, 20000],
+            "aso-oke": [21000, 28000, 25000, 23000, 19000, 18000, 17000, 14000, 24000, 30000, 28000, 29000],
+            "agbada": [45000, 47000, 50000, 56000, 72000, 81000, 83000, 98000, 67000, 115000, 120000, 124000],
+            "kaftan": [38000, 64000, 30000, 49000, 40000, 35000, 37000, 33000, 28000, 65000, 40000, 32000],
+            "senator": [49000, 55000, 42000, 49000, 63000, 76000, 40000, 48000, 52000, 75000, 65000, 65000]
+        };
+
         let pId = 1;
         this.categories.forEach(c => {
             for(let i = 0; i < 12; i++) {
-                const price = 15000 + (i * 2000);
-                const oldPrice = (i % 3 === 0) ? price + Math.floor(price * 0.25) : null; 
+                const basePrice = customPrices[c.id] ? customPrices[c.id][i] : 15000 + (i * 2000);
+                
+                let price = basePrice;
+                let oldPrice = null;
+
+                // Apply a random discount between 5% and 10% to every 3rd item
+                if (i % 3 === 0) {
+                    const discountPercent = 5 + Math.floor(Math.random() * 6); // Random integer between 5 and 10
+                    price = Math.floor(basePrice * (1 - (discountPercent / 100)));
+                    oldPrice = basePrice;
+                }
+
                 const designerName = this.designers[i % this.designers.length].name;
                 const productName = this.names[c.id] ? this.names[c.id][i] : `${c.name} Premium Style ${i + 1}`;
+                
+                let range = "mid";
+                if(price < 10000) range = "low";
+                else if(price <= 30000) range = "mid";
+                else if(price <= 80000) range = "high";
+                else range = "luxury";
 
                 this.products.push({
                     id: pId++,
@@ -70,7 +94,7 @@ const Data = {
                     price: price,
                     oldPrice: oldPrice,
                     sizes: ["S", "M", "L", "XL"],
-                    range: i > 7 ? "high" : "mid",
+                    range: range,
                     img: c.images[i],
                     cat: c.id,
                     body: ["pear", "hourglass", "athletic", "rectangle"],
